@@ -4,7 +4,6 @@ import jmespath
 
 region = "us-east-1"
 boto3.setup_default_session(profile_name="personal")
-ec2 = boto3.resource("ec2", region)
 ec2_client = boto3.client("ec2", region_name=region)
 
 if __name__ == "__main__":
@@ -24,14 +23,17 @@ if __name__ == "__main__":
 
         vpc_id = response["Vpcs"][0]["VpcId"]
 
-        response = ec2.instances.filter(
+        response = ec2_client.describe_instances(
             Filters=[{"Name": "vpc-id", "Values": [vpc_id]}]
         )
-        for instance in response:
-            if instance.instance_type == "m5.large":
+        instance_list = response["Reservations"]
+
+        for instance_obj in instance_list:
+            instance = instance_obj["Instances"][0]
+            if instance["InstanceType"] == "m5.large":
                 search_string = "[?Key == 'Name'].Value"
-                instance_name = jmespath.search(search_string, instance.tags)
-                m5_large_instances[instance.id] = instance_name
+                instance_name = jmespath.search(search_string, instance["Tags"])
+                m5_large_instances[instance["InstanceId"]] = instance_name
 
         print(m5_large_instances)
     except Exception as e:
