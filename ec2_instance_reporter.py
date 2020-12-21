@@ -41,7 +41,7 @@ def fetch_all_m5_large_instances():
 
     for instance_obj in instance_list:
         instance = instance_obj["Instances"][0]
-        if instance["InstanceType"] == "t2.nano":
+        if instance["InstanceType"] == "m5.large":
             search_string = "[?Key == 'Name'].Value"
             instance_name = jmespath.search(search_string, instance["Tags"])
             m5_large_instances[instance["InstanceId"]] = instance_name
