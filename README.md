@@ -23,14 +23,22 @@ python ec2_instance_reporter.py AWS_PROFILE
 
 > How to create the stack. This requires AWS CLI to be installed on your system. [link](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 
-aws cloudformation create-stack --stack-name prod-stack --template-body file://launch_instances.yaml --parameters ParameterKey="ProdVPC",ParameterValue="VPC_ID" ParameterKey=PrivateSubnet1CIDR,ParameterValue="SUBNET_CIDR_BLOCK"
+
+```
+aws cloudformation create-stack \
+    --stack-name prod-stack \
+    --template-body file://launch_instances.yaml \
+    --parameters ParameterKey="ProdVPC",ParameterValue="VPC_ID" ParameterKey=PrivateSubnet1CIDR,ParameterValue="SUBNET_CIDR_BLOCK"
+```
+
+VPC_ID -- can be found by running the below snippet on your system; replace VPC_ID with `VpcId`
+SUBNET_CIDR_BLOCK -- can be computed from the output of the below snippet. If your VPC CIDR block is `192.168.0.0/16`, the subnet's CIDR block can be `192.168.10.0/20`
+
 
 ```
 aws ec2 describe-vpcs \
     --filters Name=isDefault,Values=true \
-    --query 'Vpcs[*].VpcId' \
-    --output text
+    --filters Name=isDefault,Values=true \
+    --profile AWS_PROFILE
 ```
 
-VPC_ID -- can be found by running the above snippet on your system; replace VPC_ID with `VpcId`
-SUBNET_CIDR_BLOCK -- can be computed from the output of the above snippet. If your VPC CIDR block is `192.168.0.0/16`, the subnet's CIDR block can be `192.168.10.0/20`
