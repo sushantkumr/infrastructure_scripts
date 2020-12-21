@@ -15,12 +15,14 @@ Script to report all EC2 machines in a default VPC which have instance type as m
 The script can be run by executing the following command
 
 > How to run the script (AWS_PROFILE is the profile you wish to run the script for)
+
 python ec2_instance_reporter.py AWS_PROFILE
 
 
 #### launch_instances.yaml
 
 > How to create the stack. This requires AWS CLI to be installed on your system. [link](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+
 aws cloudformation create-stack --stack-name prod-stack --template-body file://launch_instances.yaml --parameters ParameterKey="ProdVPC",ParameterValue="VPC_ID" ParameterKey=PrivateSubnet1CIDR,ParameterValue="SUBNET_CIDR_BLOCK"
 
 ```
