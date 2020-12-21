@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+
+  ProdVPC:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC Id for BriteVPC
+
+  PrivateSubnet1CIDR:
+    Type: String
+    Description: Subnet CIDR block for Private Subnet
+
+Resources:
+
+  ProdWebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG for Production Web Servers
+      GroupName: prod-web-servers-sg
+      VpcId: !Ref ProdVPC
+
+  tcp80:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      IpProtocol: tcp
+      CidrIp: 0.0.0.0/0
+      FromPort: 80
+      ToPort: 80
+      GroupId: !Ref ProdWebServerSecurityGroup
+      Description: Open TCP port 80
+
+  tcp443:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      IpProtocol: tcp
+      CidrIp: 0.0.0.0/0
+      FromPort: 443
+      ToPort: 443
+      GroupId: !Ref ProdWebServerSecurityGroup
+      Description: Open TCP port 443
+
+  ProdSubNet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ProdVPC
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: ProdSubNet
+
+  ProdWebServer1: 
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: "ami-0a4a70bd98c6d6441"
+      InstanceType: "t2.nano"
+      SecurityGroupIds: [!Ref ProdWebServerSecurityGroup]
+      SubnetId: !Ref ProdSubNet
+      Tags:
+        - Key: Name
+          Value: ProdWebServer1
+        - Key: environment
+          Value: Ubuntu
+
+  ProdWebServer2:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: "ami-0a4a70bd98c6d6441"
+      InstanceType: "t2.nano"
+      SecurityGroupIds: [!Ref ProdWebServerSecurityGroup]
+      SubnetId: !Ref ProdSubNet
+      Tags:
+        - Key: Name
+          Value: ProdWebServer2
+        - Key: environment
+          Value: Ubuntu
+
+  ProdNLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: ProdNLB
+      Scheme: internet-facing
+      Subnets: [!Ref ProdSubNet]
+      Tags: 
+        - Key: Name
+          Value: ProdNLB
+      Type: network
+
+  ProdWebNLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: ProdWebServer1TargetGroup
+      Protocol: HTTP
+      Port: 80
+      Tags:
+        - Key: Name
+          Value: ProdWebServer1TargetGroup
+      Targets:
+        - Id: !Ref ProdWebServer1
+        - Id: !Ref ProdWebServer2
+      TargetType: instance
+      VpcId: !Ref ProdVPC
