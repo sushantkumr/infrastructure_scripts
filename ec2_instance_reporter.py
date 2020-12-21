@@ -1,9 +1,18 @@
 import boto3
+import sys
 import jmespath
 
+PROFILE = ''
+
+if len(sys.argv) > 1:
+    if sys.argv[1]:
+        PROFILE=sys.argv[1]
+else:
+    print("Please pass the profile name to initiazlize boto3")
+    sys.exit()
 
 region = "us-east-1"
-boto3.setup_default_session(profile_name="personal")  
+boto3.setup_default_session(profile_name=PROFILE)  
 ec2_client = boto3.client("ec2", region_name=region)
 
 
@@ -32,7 +41,7 @@ def fetch_all_m5_large_instances():
 
     for instance_obj in instance_list:
         instance = instance_obj["Instances"][0]
-        if instance["InstanceType"] == "m5.large":
+        if instance["InstanceType"] == "t2.nano":
             search_string = "[?Key == 'Name'].Value"
             instance_name = jmespath.search(search_string, instance["Tags"])
             m5_large_instances[instance["InstanceId"]] = instance_name
