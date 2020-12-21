@@ -54,7 +54,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties: 
       ImageId: "ami-0a4a70bd98c6d6441"
-      InstanceType: "t2.nano"
+      InstanceType: "r5.large"
       SecurityGroupIds: [!Ref ProdWebServerSecurityGroup]
       SubnetId: !Ref ProdSubNet
       Tags:
@@ -67,7 +67,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties: 
       ImageId: "ami-0a4a70bd98c6d6441"
-      InstanceType: "t2.nano"
+      InstanceType: "r5.large"
       SecurityGroupIds: [!Ref ProdWebServerSecurityGroup]
       SubnetId: !Ref ProdSubNet
       Tags:
