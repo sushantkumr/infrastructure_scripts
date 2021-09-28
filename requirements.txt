@@ -3,7 +3,7 @@ botocore==1.19.40
 common==0.1.2
 jmespath==0.10.0
 pudb==2019.2
-Pygments==2.7.3
+Pygments==2.7.4
 python-dateutil==2.8.1
 s3transfer==0.3.3
 six==1.15.0
